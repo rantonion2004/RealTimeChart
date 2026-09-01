@@ -1,0 +1,15 @@
+services:
+  postgres:
+    image: postgres:18
+    container_name: lucid-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: lucid_user
+      POSTGRES_PASSWORD: dev_password
+      POSTGRES_DB: lucid_dev
+    ports:
+      - "5432:5432"
+    volumes:
+      - lucid_pgdata:/var/lib/postgresql
+volumes:
+  lucid_pgdata:
