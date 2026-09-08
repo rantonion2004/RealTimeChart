@@ -19,8 +19,10 @@ public class BasicController : ControllerBase
 
     [HttpGet]
     public async Task<ActionResult<IEnumerable<User>>> GetUsers()
-    {
-        return await _context.Users.ToListAsync();
+    {   
+        var products = await _context.Users.ToListAsync();
+        var xd = 1;
+        return Ok(xd);
     }
 
 }
