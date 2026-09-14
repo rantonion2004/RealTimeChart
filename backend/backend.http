@@ -1,6 +1,28 @@
 @backend_HostAddress = http://localhost:5298
 
-GET {{backend_HostAddress}}/weatherforecast/
+### Registrar usuario de prueba
+POST {{backend_HostAddress}}/api/auth/register
+Content-Type: application/json
+
+{
+	"email": "test@example.com",
+	"password": "Password123!",
+	"displayName": "Test User"
+}
+
+### Obtener access token
+# @name login
+POST {{backend_HostAddress}}/api/auth/login
+Content-Type: application/json
+
+{
+	"email": "test@example.com",
+	"password": "Password123!"
+}
+
+### Endpoint protegido
+GET {{backend_HostAddress}}/api/Basic
 Accept: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwMWEwOWI3Yy03ZTZjLTcyZWUtYmI1My1kY2U0ZGQ2YzgzZTQiLCJlbWFpbCI6InJhbnRvbmlvbjIwMDRAb3V0bG9vay5jb20iLCJkaXNwbGF5TmFtZSI6InJhbnRvbmlvbjIwMDQiLCJleHAiOjE3ODkzNDUzNTYsImlzcyI6Imx1Y2lkLWFwaSIsImF1ZCI6Imx1Y2lkLWNsaWVudCJ9.QzmEhAinntHX3KO3evJGsng09LPW6Ts-VpCVWZXd1uY
 
 ###

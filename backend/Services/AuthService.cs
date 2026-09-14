@@ -104,10 +104,17 @@ public class AuthService: IAuthService
                 {
                     UserName = externalInfo.Email,
                     Email = externalInfo.Email,
-                    DisplayName = externalInfo.DisplayName,
+                    DisplayName = string.IsNullOrWhiteSpace(externalInfo.DisplayName)
+                        ? externalInfo.Email.Split('@')[0]
+                        : externalInfo.DisplayName,
                     EmailConfirmed = true
                 };
-                await _userManager.CreateAsync(user);
+                var createResult = await _userManager.CreateAsync(user);
+                if (!createResult.Succeeded)
+                {
+                    throw new InvalidOperationException(
+                        string.Join(", ", createResult.Errors.Select(error => error.Description)));
+                }
             }
 
             //add in the user login table a new register of the user.

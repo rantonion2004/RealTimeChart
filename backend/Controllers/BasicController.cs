@@ -1,6 +1,7 @@
 
 using backend.Data;
 using backend.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,6 +9,7 @@ namespace backend.Controllers;
 
 [Route("/api/[controller]")]
 [ApiController]
+[Authorize]
 public class BasicController : ControllerBase
 {
     private readonly AppDbContext _context;

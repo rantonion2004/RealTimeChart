@@ -4,7 +4,6 @@ using backend.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
@@ -17,25 +16,6 @@ builder.Services.AddOpenApi();
 
 //key from Jwt
 var jwtKey = builder.Configuration["Jwt:Key"]!;
-
-//Middleware to Add Authentication with Jwt
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
-    {
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
-            ValidIssuer = builder.Configuration["Jwt:Issuer"],
-            ValidAudience = builder.Configuration["Jwt:Audience"],
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
-            ClockSkew= TimeSpan.Zero
-        };
-});
-
-builder.Services.AddAuthorization();
 
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
@@ -54,14 +34,44 @@ builder.Services.AddIdentity<User, IdentityRole<Guid>>(options =>
 .AddEntityFrameworkStores<AppDbContext>()
 .AddDefaultTokenProviders();
 
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+        ValidAudience = builder.Configuration["Jwt:Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
+        ClockSkew = TimeSpan.Zero
+    };
+});
+
+builder.Services.AddAuthorization();
+
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Configure the HTTP request pipeline for swagger ui.
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+
+
+    app.UseSwaggerUI(options =>
+    {
+        options.SwaggerEndpoint("/openapi/v1.json", "My API v1");
+    });
+
 }
+
 
 app.UseHttpsRedirection();
 

@@ -16,7 +16,7 @@ public class GoogleAuthValidator : IExternalAuthValidator
         //set the Audience
         var settings = new GoogleJsonWebSignature.ValidationSettings
         {
-            Audience = new[] {_config["Google.ClientId"]!}
+            Audience = new[] {_config["Google:ClientId"]!}
         };
 
         //

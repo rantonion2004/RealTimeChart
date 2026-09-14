@@ -14,7 +14,7 @@ public class AppDbContext : IdentityDbContext<User, IdentityRole<Guid>, Guid>
     public DbSet<Project> Projects => Set<Project>();
     public DbSet<ProjectMember> ProjectMembers => Set<ProjectMember>();
     public DbSet<Diagram> Diagrams => Set<Diagram>();
-
+    public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
