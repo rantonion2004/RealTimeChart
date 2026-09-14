@@ -10,7 +10,7 @@ public class ProjectService : IProjectService
 {
     
     private readonly AppDbContext _context;
-    public ProjectService(AppDbContext context) => context = _context;
+    public ProjectService(AppDbContext context) => _context = context;
 
     public async Task<ProjectResponse> CreateAsync(Guid userId, CreateProjectRequest request)
     {

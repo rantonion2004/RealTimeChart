@@ -21,14 +21,14 @@ public interface IAuthService
 }
 public class AuthService: IAuthService
 {
-    private readonly UserManager<User> _userManager;
+    private readonly UserManager<ApplicationUser> _userManager;
     private readonly ITokenService _tokenService;
     private readonly AppDbContext _context;
 
     private readonly IEnumerable<IExternalAuthValidator> _externalValidators;
 
     public AuthService(
-        UserManager<User> userManager, 
+        UserManager<ApplicationUser> userManager, 
         ITokenService tokenService, 
         AppDbContext context,
         IEnumerable<IExternalAuthValidator> externalValidators
@@ -44,7 +44,7 @@ public class AuthService: IAuthService
     public async Task<AuthResponse> RegisterAsync(RegisterRequest request)
     {   
         //get the register request and create an object user
-        var user = new User
+        var user = new ApplicationUser
         {
             UserName = request.Email,
             Email = request.Email,
@@ -102,7 +102,7 @@ public class AuthService: IAuthService
             //if not, the user is created in the user table
             if(user is null)
             {
-                user = new User
+                user = new ApplicationUser
                 {
                     UserName = externalInfo.Email,
                     Email = externalInfo.Email,
@@ -160,7 +160,7 @@ public class AuthService: IAuthService
     }
 
     //Method to issue tokens when loging in, refreshing and registering
-    private async Task<AuthResponse> IssueTokensAsync(User user)
+    private async Task<AuthResponse> IssueTokensAsync(ApplicationUser user)
     {
         //obtain the roles and generate a new AccessToken and RefreshToken
         var roles = await _userManager.GetRolesAsync(user);
@@ -193,7 +193,7 @@ public class AuthService: IAuthService
         if(stored is null) return;
 
         stored.RevokedAt = DateTime.UtcNow;
-        
+
         await _context.SaveChangesAsync();   
     }
 

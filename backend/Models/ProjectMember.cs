@@ -17,6 +17,6 @@ public class ProjectMember
 
     public Project Project {get; set;} = null!;
     
-    public User User {get; set;} = null!;
+    public ApplicationUser User {get; set;} = null!;
     
 }

@@ -20,7 +20,7 @@ public class BasicController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<User>>> GetUsers()
+    public async Task<ActionResult<IEnumerable<ApplicationUser>>> GetUsers()
     {   
         var products = await _context.Users.ToListAsync();
         var xd = 1;

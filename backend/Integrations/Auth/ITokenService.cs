@@ -10,7 +10,7 @@ public interface ITokenService
 {
     
     //Method to generate Access token based on the user and its roles
-    string GenerateAccessToken(User user, IList<string> roles);
+    string GenerateAccessToken(ApplicationUser user, IList<string> roles);
     
     //method to generate a refresh token and its identity with the userId
     (string rawToken, RefreshToken entity) GenerateRefreshToken(Guid userId);
@@ -24,7 +24,7 @@ public class TokenService : ITokenService
     public TokenService(IConfiguration config) => _config = config;
 
     //class to generate the access token based on the user and its roles
-    public string GenerateAccessToken(User user, IList<string> roles)
+    public string GenerateAccessToken(ApplicationUser user, IList<string> roles)
     {
         //
         var claims = new List<Claim>

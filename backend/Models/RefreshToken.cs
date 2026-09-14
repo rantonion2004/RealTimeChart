@@ -14,7 +14,7 @@ public class RefreshToken
     public DateTime ExpiresAt{get; set;}
     public DateTime CreatedAt{get; set;} = DateTime.UtcNow;
     public DateTime? RevokedAt {get; set;}
-    public User User {get; set;} = null!;
+    public ApplicationUser User {get; set;} = null!;
     
     //to verify if it is active, it show if is not revoked and if it hasn't expired
     public bool IsActive => RevokedAt is null && DateTime.UtcNow < ExpiresAt;

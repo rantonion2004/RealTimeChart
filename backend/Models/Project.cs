@@ -11,7 +11,7 @@ public class Project
     public DateTime CreatedAt {get; set;} = DateTime.UtcNow;
     public DateTime UpdatedAt {get; set;} = DateTime.UtcNow;
 
-    public User Owner {get; set;} = null!;
+    public ApplicationUser Owner {get; set;} = null!;
 
     public ICollection<ProjectMember> Members {get; set;} = new List<ProjectMember>();
     

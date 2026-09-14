@@ -5,9 +5,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using backend.Models;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
-public class UserConfiguration: IEntityTypeConfiguration<User>
+public class UserConfiguration: IEntityTypeConfiguration<ApplicationUser>
 {
-    public void Configure(EntityTypeBuilder<User> builder)
+    public void Configure(EntityTypeBuilder<ApplicationUser> builder)
     {
         builder.Property(u => u.DisplayName)
             .HasMaxLength(100)
