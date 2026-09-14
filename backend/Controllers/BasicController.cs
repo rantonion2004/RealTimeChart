@@ -27,4 +27,12 @@ public class BasicController : ControllerBase
         return Ok(xd);
     }
 
+    [Authorize(Roles = "Admin")]
+    [HttpGet]
+    public async Task<ActionResult<string>> AdminEndpoint()
+    {
+        return "ere admin mano";
+    }
+
+
 }

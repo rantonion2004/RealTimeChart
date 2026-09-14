@@ -25,11 +25,18 @@ namespace backend.DTOs.AuthDTOs
         public string RefreshToken{get;set;} = string.Empty;
     }
 
+
     public class AuthResponse
     {
         public string AccessToken{get;set;} = string.Empty;
         public string RefreshToken{get;set;} = string.Empty;
         public DateTime AccessTokenExpiresAt{get;set;}
     }
+
+    public class LogoutRequest
+    {
+        public string RefreshToken { get; set; } = string.Empty;
+    }
+
 
 }

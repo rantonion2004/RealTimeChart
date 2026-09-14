@@ -1,4 +1,5 @@
 using backend.DTOs.AuthDTOs;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
@@ -19,10 +20,20 @@ public class AuthController : ControllerBase
         => Ok(await _authService.LoginAsync(request));
     
     [HttpPost("refresh")]
-    public async Task<ActionResult<AuthResponse>> refresh(RefreshRequest request)
+    public async Task<ActionResult<AuthResponse>> Refresh(RefreshRequest request)
         => Ok(await _authService.RefreshAsync(request.RefreshToken));
 
     [HttpPost("external")]
     public async Task<ActionResult<AuthResponse>> ExternalLogin(ExternalLoginRequest request)
         => Ok(await _authService.ExternalLoginAsync(request));
+
+    [HttpPost("logout")]
+    [Authorize]
+    public async Task<IActionResult> Logout(LogoutRequest request)
+    {
+        await _authService.LogoutAsync(request.RefreshToken);
+        return NoContent();
+    }
+
+    
 }

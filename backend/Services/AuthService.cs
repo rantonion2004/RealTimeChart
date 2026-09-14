@@ -16,6 +16,8 @@ public interface IAuthService
     Task<AuthResponse> LoginAsync(LoginRequest request);
     Task<AuthResponse> RefreshAsync(string rawToken);
     Task<AuthResponse> ExternalLoginAsync(ExternalLoginRequest request);
+    Task LogoutAsync(string rawToken);
+    
 }
 public class AuthService: IAuthService
 {
@@ -180,5 +182,19 @@ public class AuthService: IAuthService
 
     }
 
+    public async Task LogoutAsync(string rawToken)
+    {
+        
+        var hash = Convert.ToBase64String(SHA256.HashData(Encoding.UTF8.GetBytes(rawToken)));
+ 
+        var stored = await _context.Set<RefreshToken>()
+                    .FirstOrDefaultAsync(rt => rt.TokenHash == hash);
+
+        if(stored is null) return;
+
+        stored.RevokedAt = DateTime.UtcNow;
+        
+        await _context.SaveChangesAsync();   
+    }
 
 }
