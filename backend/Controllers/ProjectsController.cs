@@ -10,7 +10,7 @@ using backend.Extenions;
 
 
 
-[Route("/api/[controller]")]
+[Route("/api/projects")]
 [ApiController]
 [Authorize]
 public class ProjectsController : ControllerBase

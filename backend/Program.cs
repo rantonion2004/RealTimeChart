@@ -21,7 +21,9 @@ builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IExternalAuthValidator, GoogleAuthValidator>();
 
+builder.Services.AddScoped<IProjectAccessService, ProjectAccessService>();
 builder.Services.AddScoped<IProjectService, ProjectService>();
+
 
 //add db context to the database
 builder.Services.AddDbContext<AppDbContext>(options =>
@@ -60,6 +62,11 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddAuthorization();
 
+//builder options for the exception handlers
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
+
+
 
 var app = builder.Build();
 
@@ -75,7 +82,8 @@ if (app.Environment.IsDevelopment())
     });
 
 }
-
+//before UseAuthentication and UseAuth
+app.UseExceptionHandler();
 
 app.UseHttpsRedirection();
 

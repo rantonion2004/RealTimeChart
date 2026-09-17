@@ -1,5 +1,6 @@
 
 using Google.Apis.Auth;
+using backend.AppExceptions;
 
 public class GoogleAuthValidator : IExternalAuthValidator
 {
@@ -28,7 +29,7 @@ public class GoogleAuthValidator : IExternalAuthValidator
         }
         catch (InvalidJwtException)
         {
-            throw new UnauthorizedAccessException("Token de Google Invalido");
+            throw new AuthenticationFailedException("Token de Google Invalido");
         }
 
     }

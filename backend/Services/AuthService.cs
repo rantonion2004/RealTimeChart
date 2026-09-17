@@ -8,7 +8,7 @@ using backend.Data;
 using System.Security.Cryptography;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
-
+using backend.AppExceptions;
 
 public interface IAuthService
 {
@@ -54,7 +54,7 @@ public class AuthService: IAuthService
         //with user manager, create the "result" with the password
         var result = await _userManager.CreateAsync(user, request.Password);
         if(!result.Succeeded) 
-            throw new InvalidOperationException(string.Join(", ", result.Errors.Select(e => e.Description)));
+            throw new ValidationException(result.Errors.Select(e => e.Description));
         
         //if succeeded, issue the tokens
         return await IssueTokensAsync(user);
@@ -66,11 +66,11 @@ public class AuthService: IAuthService
     {
         // find the user with the email
         var user = await _userManager.FindByEmailAsync(request.Email)
-            ?? throw new UnauthorizedAccessException("Credenciales invalidad");
+            ?? throw new AuthenticationFailedException("Credenciales invalidad");
         
         //now that you have the user, check if the password is valid
         var valid = await _userManager.CheckPasswordAsync(user, request.Password);
-        if(!valid) throw new UnauthorizedAccessException("Credenciales invalidad");
+        if(!valid) throw new AuthenticationFailedException("Credenciales invalidad");
 
         return await IssueTokensAsync(user);
 
@@ -81,7 +81,7 @@ public class AuthService: IAuthService
     {
         //ask if the requested validator matchs the provider
         var validator = _externalValidators.FirstOrDefault(v => v.Provider == request.Provider)
-            ?? throw new NotSupportedException($"Proveedor '{request.Provider}' no soportado");
+            ?? throw new UnsupportedProviderException($"Proveedor '{request.Provider}' no soportado");
 
         //check if the token Id is valid to google
         var externalInfo = await validator.ValidateAsync(request.IdToken);
@@ -140,7 +140,7 @@ public class AuthService: IAuthService
             .FirstOrDefaultAsync(rt => rt.TokenHash == hash);
         
         if(stored is null || !stored.IsActive)
-            throw new UnauthorizedAccessException("Refresh token inválido o expirado");
+            throw new AuthenticationFailedException("Refresh token inválido o expirado");
         
         //if its saved, revoked it
         //stored is just an entity that EF obtained from the DB
@@ -154,7 +154,7 @@ public class AuthService: IAuthService
 
         //find the user by the Id 
         var user = await _userManager.FindByIdAsync(stored.UserId.ToString())
-            ?? throw new UnauthorizedAccessException("Usuario no encontrado");
+            ?? throw new AuthenticationFailedException("Usuario no encontrado");
 
         return await IssueTokensAsync(user);
     }

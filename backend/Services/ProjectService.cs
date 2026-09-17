@@ -5,12 +5,18 @@ using backend.DTOs.Responses.ProjectResponses;
 using backend.Models;
 using Microsoft.EntityFrameworkCore;
 using backend.Data;
+using backend.AppExceptions;
 
 public class ProjectService : IProjectService
 {
     
     private readonly AppDbContext _context;
-    public ProjectService(AppDbContext context) => _context = context;
+    private readonly IProjectAccessService _access;
+    public ProjectService(AppDbContext context, IProjectAccessService access)
+    {
+        _context = context;
+        _access = access;
+    }
 
     public async Task<ProjectResponse> CreateAsync(Guid userId, CreateProjectRequest request)
     {
@@ -58,7 +64,7 @@ public class ProjectService : IProjectService
 
     public async Task<ProjectResponse> GetByIdAsync(Guid userId, Guid projectId)
     {
-        var membership = await GetMembershipOrThrowAsync(userId, projectId);
+        var membership = await _access.GetMembershipOrThrowAsync(userId, projectId);
 
         return MapToResponse(membership.Project, membership.Role);
         
@@ -67,10 +73,9 @@ public class ProjectService : IProjectService
     public async Task<ProjectResponse> UpdateAsync(Guid userId, Guid projectId, UpdateProjectRequest request)
     {
         
-        var membership = await GetMembershipOrThrowAsync(userId, projectId);
+        var membership = await _access.GetMembershipOrThrowAsync(userId, projectId);
 
-        if(membership.Role != ProjectRole.Owner)
-            throw new UnauthorizedAccessException("Solo el creador puede renombrar el proyecto");
+        _access.EnsureIsOwner(membership);
         
         membership.Project.Name = request.Name;
         membership.Project.UpdatedAt = DateTime.UtcNow;
@@ -84,34 +89,17 @@ public class ProjectService : IProjectService
     public async Task DeleteAsync(Guid userId, Guid projectId)
     {
         
-        var membership = await GetMembershipOrThrowAsync(userId, projectId);
+        var membership = await _access.GetMembershipOrThrowAsync(userId, projectId);
 
-        if(membership.Role != ProjectRole.Owner )
-            throw new UnauthorizedAccessException("Solo el creador puede borrar proyectos");
-        
+        _access.EnsureIsOwner(membership);
         _context.Projects.Remove(membership.Project);
+
         await _context.SaveChangesAsync();
 
     }
 
     //Metodo para obtener
-    private async Task<ProjectMember> GetMembershipOrThrowAsync(Guid userId, Guid projectId)
-    {
-        //el filtro primero busca el primer registro de ProjectMembers donde:
-        // --> ProjectId coincide con project
-        // --> UserId coincide con userId
-        // --> o sea, donde se encuentre el project member especifico
-        // luego de eso, si si encuentra el Project member(el cual es cargado), dice
-        // --> incluye tambien su proyecto relacionado
-        //, haciendo que igual se cargue el registro del proyecto en el EF(sin esa linea solo)
-        // se cargaria ProjectMember
-        var membership = await _context.ProjectMembers
-                .Include(pm => pm.Project)
-                .FirstOrDefaultAsync(pm => pm.ProjectId == projectId && pm.UserId == userId);
-        
-        //404, si el proyecto no existe o si si existe pero no tiene permiso dice que "no lo encontro"
-        return membership ?? throw new KeyNotFoundException("Proyecto no encontrado");
-    }
+
 
     private static ProjectResponse MapToResponse(Project project, ProjectRole role) => new(){
         Id = project.Id,
