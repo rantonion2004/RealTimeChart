@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
@@ -17,6 +18,9 @@ builder.Services.AddOpenApi();
 //key from Jwt
 var jwtKey = builder.Configuration["Jwt:Key"]!;
 
+//Policy
+const string FrontEndPolicy = "FrontEndPolicy";
+
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IExternalAuthValidator, GoogleAuthValidator>();
@@ -25,7 +29,15 @@ builder.Services.AddScoped<IProjectAccessService, ProjectAccessService>();
 builder.Services.AddScoped<IDiagramService, DiagramService>();
 builder.Services.AddScoped<IProjectService, ProjectService>();
 
-
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(FrontEndPolicy, policy =>
+    {
+        policy.WithOrigins(builder.Configuration["Frontend:Url"] ?? "http://localhost:5173")
+                .AllowAnyHeader()
+                .AllowAnyMethod();
+    });
+});
 
 //add db context to the database
 builder.Services.AddDbContext<AppDbContext>(options =>
@@ -86,6 +98,8 @@ if (app.Environment.IsDevelopment())
 }
 //before UseAuthentication and UseAuth
 app.UseExceptionHandler();
+
+app.UseCors(FrontEndPolicy);
 
 app.UseHttpsRedirection();
 
