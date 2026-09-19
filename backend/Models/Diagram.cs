@@ -13,7 +13,7 @@ public class Diagram
     public string Content {get; set;} = "{}";
 
     //version to manage
-    public byte[] RowVersion {get; set;} = null!;
+    //public byte[] RowVersion {get; set;} = null!;
 
     public DateTime CreatedAt {get; set;} = DateTime.UtcNow;
 

@@ -35,14 +35,14 @@ namespace backend.DTOs.Responses.DiagramResponses
         public DateTime UpdatedAt {get;set;}
         public string RowVersion {get;set;} = string.Empty;
 
-        public static DiagramResponse MapFrom(Diagram diagram) => new()
+        public static DiagramResponse MapFrom(Diagram diagram, uint xmin) => new()
         {
             Id = diagram.Id,
             ProjectId = diagram.ProjectId,
             Name = diagram.Name,
             Content = diagram.Content,
             UpdatedAt = diagram.UpdatedAt,
-            RowVersion = Convert.ToBase64String(diagram.RowVersion)
+            RowVersion = xmin.ToString()
         };
 
         public static DiagramResponse MapFrom(
@@ -51,7 +51,7 @@ namespace backend.DTOs.Responses.DiagramResponses
             string xname,
             string xcontent,
             DateTime xupdatedat,
-            byte[] xrowversion
+            uint xmin
         ) => new()
         {
             Id = xid,
@@ -59,7 +59,7 @@ namespace backend.DTOs.Responses.DiagramResponses
             Name = xname,
             Content = xcontent,
             UpdatedAt = xupdatedat,
-            RowVersion = Convert.ToBase64String(xrowversion)
+            RowVersion = xmin.ToString()
         };
 
     }

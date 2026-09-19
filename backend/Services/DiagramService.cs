@@ -11,9 +11,9 @@ public class DiagramService : IDiagramService
 {
     private readonly AppDbContext _context;
 
-    private readonly ProjectAccessService _access;
+    private readonly IProjectAccessService _access;
 
-    public DiagramService( AppDbContext context, ProjectAccessService access)
+    public DiagramService( AppDbContext context, IProjectAccessService access)
     {
         _context = context;
         _access = access;
@@ -37,7 +37,8 @@ public class DiagramService : IDiagramService
         _context.Diagrams.Add(diagram);
         await _context.SaveChangesAsync();
 
-        return DiagramResponse.MapFrom(diagram);
+        var xmin = _context.Entry(diagram).Property<uint>("xmin").CurrentValue;
+        return DiagramResponse.MapFrom(diagram, xmin);
 
     }
 
@@ -60,7 +61,8 @@ public class DiagramService : IDiagramService
 
         var diagram = await GetDiagramOrThrowAsync(projectId, diagramId );
 
-        return DiagramResponse.MapFrom(diagram);
+        var xmin = _context.Entry(diagram).Property<uint>("xmin").CurrentValue;
+        return DiagramResponse.MapFrom(diagram, xmin);
 
     }
 
@@ -118,9 +120,10 @@ public class DiagramService : IDiagramService
         //Also, EF only updatess if CurrentValue != OriginalValue
 
         _context.Entry(diagram)
-                .Property(d => d.RowVersion)
-                .OriginalValue = 
-                Convert.FromBase64String(request.RowVersion);
+                .Property<uint>("xmin")
+                .OriginalValue = uint.Parse(request.RowVersion);
+
+        
 
         try
         {
@@ -132,7 +135,9 @@ public class DiagramService : IDiagramService
             ("Este diagrama fue modificado por alguien mas. Recarga y vuelve a intentar.");
         }
 
-        return DiagramResponse.MapFrom(diagram);
+        var xmin = _context.Entry(diagram).Property<uint>("xmin").CurrentValue;
+
+        return DiagramResponse.MapFrom(diagram, xmin);
 
     }
 

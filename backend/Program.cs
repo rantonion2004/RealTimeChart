@@ -22,7 +22,9 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IExternalAuthValidator, GoogleAuthValidator>();
 
 builder.Services.AddScoped<IProjectAccessService, ProjectAccessService>();
+builder.Services.AddScoped<IDiagramService, DiagramService>();
 builder.Services.AddScoped<IProjectService, ProjectService>();
+
 
 
 //add db context to the database

@@ -16,8 +16,13 @@ public class DiagramConfiguration: IEntityTypeConfiguration<Diagram>
         builder.Property(d => d.Content)
             .HasColumnType("jsonb");
         
-        builder.Property(d => d.RowVersion)
+        // builder.Property(d => d.RowVersion)
+        //     .IsRowVersion();
+        
+        builder.Property<uint>("xmin")
+            .HasColumnName("xmin")
             .IsRowVersion();
+
         
         builder.Property(d => d.CreatedAt)
             .HasDefaultValueSql("now()");

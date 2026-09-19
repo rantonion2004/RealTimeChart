@@ -32,7 +32,7 @@ public class DiagramController: ControllerBase
     public async Task<ActionResult<DiagramResponse>> GetById(Guid projectId, Guid diagramId)
         => Ok(await _diagramService.GetByIdAsync(User.GetUserId(), projectId, diagramId));
 
-    [HttpPut("/name/{diagramId}")]
+    [HttpPut("{diagramId}/name")]
     public async Task<ActionResult<DiagramSummaryResponse>> UpdateName(Guid projectId, Guid diagramId, UpdateDiagramNameRequest request)
         => Ok(await _diagramService.UpdateNameAsync(User.GetUserId(), projectId, diagramId, request));
 
