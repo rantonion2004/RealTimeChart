@@ -3,7 +3,7 @@
 //api URL for the other functions that call backend endpoint
 import { tokenStorage } from "../auth/tokenStorage";
 
-const API_URL = import.meta.env.BASE_URL;
+const API_URL = import.meta.env.VITE_API_URL;
 
 let refreshPromise: Promise<boolean> | null = null;
 
@@ -101,6 +101,8 @@ export async function apiFetch(path: string, options: RequestInit = {}):Promise<
         if (refreshed) {
             response = await doFetch(tokenStorage.getAccessToken());
         } else {
+            //si falla el intento de hacer refresh token, eso significa
+            //que el refresh expiro y avento un 401 
             tokenStorage.clear();
             window.location.href = "/login";
             throw new Error("Sesion expirada");
