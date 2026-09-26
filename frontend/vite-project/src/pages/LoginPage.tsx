@@ -1,12 +1,14 @@
 import {useState, type FormEvent} from 'react';
 import {useNavigate, Link} from 'react-router-dom';
-import {login} from '../api/auth'
+import { GoogleLogin, type CredentialResponse } from '@react-oauth/google';
+import { useAuthActions } from '../hooks/useAuthActions';
 
 export function LoginPage(){
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
+    const { loginWithPassword, loginWithGoogle } = useAuthActions();
     const navigate = useNavigate();
 
     async function handleSubmit(e: FormEvent){
@@ -15,7 +17,7 @@ export function LoginPage(){
         setLoading(true);
 
         try{
-            await login(email, password);
+            await loginWithPassword(email, password);
             navigate('/home');
         } catch(err){
             setError(err instanceof Error ? err.message : 'Error al iniciar sesion');
@@ -23,6 +25,29 @@ export function LoginPage(){
             setLoading(false);
         }
 
+    }
+
+    async function handleGoogleSuccess(credentialResponse: CredentialResponse){
+
+        const idToken = credentialResponse.credential;
+        //console.log(idToken)
+        if(!idToken) {
+            setError('IdToken Invalido')
+            return;
+        }
+        //console.log(idToken)
+        setError(null);
+        setLoading(true);
+        try{
+            await loginWithGoogle(idToken);
+            //console.log(idToken);
+            navigate('/home');
+        } catch(err){
+            setError(err instanceof Error ? err.message: 'Error al iniciar sesion con google');
+
+        }finally{
+            setLoading(false);
+        }
     }
 
     return(
@@ -42,7 +67,7 @@ export function LoginPage(){
                 <div>
                     <label htmlFor='password'>Password</label>
                     <input 
-                        id="passowrd"
+                        id="password"
                         type="password"
                         value={password}
                         onChange={(e)=> setPassword(e.target.value)}
@@ -60,6 +85,17 @@ export function LoginPage(){
             <p>No tienes cuenta? 
                 <Link to="/register">Registrate</Link>
             </p>
+            <p>Proveedores Externos </p>
+            <div>
+                {loading ? (
+                    <span aria-live="polite">Iniciando sesión...</span>
+                ) : (
+                    <GoogleLogin
+                        onSuccess={handleGoogleSuccess}
+                        onError={() => setError('Inicio de Google inválido')}
+                    />
+                )}
+            </div>
 
         </div>
     );

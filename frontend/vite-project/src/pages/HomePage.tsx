@@ -1,13 +1,18 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {base} from '../api/base'
-import {logout} from '../api/auth'
+import { useAuthActions } from "../hooks/useAuthActions";
 
 export function HomePage(){
 
     const [status, setStatus] = useState<'loading' | 'ok' | 'error'>('loading');
     const [message, setMessage] = useState('');
     const navigate = useNavigate();
+    const {logoutUser} = useAuthActions();
+    async function handleLogout(){
+        await logoutUser();
+        navigate('/login');
+    }
 
     useEffect(
         () => {
@@ -22,10 +27,7 @@ export function HomePage(){
             });
         }, []);
     
-    async function handleLogout(){
-        await logout();
-        navigate('/login');
-    }
+
 
     return(
         <div>

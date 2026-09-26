@@ -2,6 +2,7 @@
 // file to call all the auth endpoints 
 import { publicFetch, extractErrorMessage, apiFetch} from "./client";
 import { tokenStorage } from "../auth/tokenStorage";
+//import { useAuth } from "../auth/useAuth";
 
 export interface AuthResponse{
     accessToken: string;
@@ -9,9 +10,11 @@ export interface AuthResponse{
     accessTokenExpiresAt: string;
 }
 
+
 //funcion para hacer el request de Auth endpoints publicos
 async function handleAuthRequest(path: string, body: object, fallbackError: string): Promise<AuthResponse>{
     //obtener el response(method post y el body )
+    
     const response = await publicFetch(path, {
         method: 'POST',
         body: JSON.stringify(body)
@@ -25,6 +28,7 @@ async function handleAuthRequest(path: string, body: object, fallbackError: stri
     // 
     const data: AuthResponse = await response.json();
     tokenStorage.setTokens(data.accessToken, data.refreshToken)
+    
     return data
 }
 

@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from "react";
 import { useNavigate} from "react-router-dom";
-import {register} from "../api/auth"
+import { useAuthActions } from "../hooks/useAuthActions";
 
 
 export function RegisterPage(){
@@ -11,6 +11,7 @@ export function RegisterPage(){
     const [confirmPassword, setConfirmPassword] = useState('');
     const [error , setError] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
+    const {registerUser} = useAuthActions();
     const navigate = useNavigate();
 
     async function handleSubmit(e : FormEvent){
@@ -20,7 +21,7 @@ export function RegisterPage(){
         setLoading(true);
 
         try{
-            await register(displayName,email,password);
+            await registerUser(displayName,email,password);
             navigate('/home')
         }catch(err) {
             setError(err instanceof Error ? err.message : "No se pudo hacer el registro")

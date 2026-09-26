@@ -10,8 +10,11 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@auth0/auth0-react": "^2.27.0",
+    "@react-oauth/google": "^0.13.5",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
+    "react-jwt": "^2.1.1",
     "react-router-dom": "^7.18.4"
   },
   "devDependencies": {

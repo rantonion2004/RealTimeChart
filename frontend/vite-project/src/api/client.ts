@@ -7,6 +7,13 @@ const API_URL = import.meta.env.VITE_API_URL;
 
 let refreshPromise: Promise<boolean> | null = null;
 
+type SessionExpiredHandler = () => void;
+let onSessionExpired: SessionExpiredHandler | null = null;
+
+export function registerSessionExpiredHandler(handler: SessionExpiredHandler){
+    onSessionExpired = handler;
+}
+
 async function refreshTokens() : Promise<boolean>{
     //get RT from storage
     const refreshToken = tokenStorage.getRefreshToken();
@@ -81,7 +88,7 @@ export async function apiFetch(path: string, options: RequestInit = {}):Promise<
             //el primero en hacer la request, cambia el valor de refreshPromise a un promise
             //que finalmente da null despues de intentar pedir el refresh token.
             refreshPromise = refreshTokens().finally(() => {
-            refreshPromise = null;
+                refreshPromise = null;
             });
         }
 
@@ -104,10 +111,12 @@ export async function apiFetch(path: string, options: RequestInit = {}):Promise<
             //si falla el intento de hacer refresh token, eso significa
             //que el refresh expiro y avento un 401 
             tokenStorage.clear();
-            window.location.href = "/login";
+            //window.location.href = "/login";
+            onSessionExpired?.();
             throw new Error("Sesion expirada");
         }
     }
 
     return response;
 }
+

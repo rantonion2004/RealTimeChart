@@ -1,12 +1,25 @@
-import {Navigate} from 'react-router-dom'
+import { Navigate } from 'react-router-dom';
 import type { ReactNode } from 'react'
-import { tokenStorage } from '../auth/tokenStorage'
+import {useAuth} from '../hooks/useAuth';
+import {NavBar} from '../components/NavBar';
+import { useAuthActions } from '../hooks/useAuthActions';
+//import { useNavigate } from 'react-router-dom';
+
 
 export function ProtectedRoute({children}: {children: ReactNode}){
-    const hasToken = !!tokenStorage.getAccessToken();
-    if(!hasToken){
-        return<Navigate to="/login" replace/>
+    const {isAuthenticated, displayName} = useAuth();
+    //const navigate = useNavigate();
+    const {logoutUser} = useAuthActions();
+
+    async function handleLogout(){
+        await logoutUser();
+        //navigate('/login');
     }
 
-    return <>{children}</>
+    
+    return !isAuthenticated ? <Navigate to="/login" replace />: 
+    <>
+        <NavBar onLogout={handleLogout} dispName={displayName} />
+        {children}
+    </>;
 }
