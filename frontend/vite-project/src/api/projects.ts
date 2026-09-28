@@ -4,17 +4,28 @@
 import {apiFetch, extractErrorMessage} from "./client";
 import { type ProjectResponse } from "../types/ProjectResponse";
 
+//with default diagrams receives the project and
+//returns it with its diagram(if it has) or a null(it it doesn't have)
+function withDefaultDiagrams(project: ProjectResponse): ProjectResponse {
+    return { ...project, Diagrams: project.Diagrams ?? null };
+}
+//now, on each answer, if it returns a ProjectResponse,
+//it needs to return it with diagrams, if they don't have diagrams,
+//it sets its value as null
+
 
 export async function getMyProjects(): Promise<ProjectResponse[]>{
     const response = await apiFetch('/api/projects');
     if(!response.ok) throw new Error(await extractErrorMessage(response, 'Error al cargar proyectos'));
-    return response.json();
+    const projects: ProjectResponse[] = await response.json();
+    return projects.map(withDefaultDiagrams);
 }
 
 export async function getById(projectId: string): Promise<ProjectResponse>{
     const response = await apiFetch(`/api/projects/${projectId}`);
     if(!response.ok) throw new Error(await extractErrorMessage(response, 'Error al cargar proyecto'));
-    return response.json();
+    const project: ProjectResponse = await response.json();
+    return withDefaultDiagrams(project);
 }
 
 export async function createProject(name: string): Promise<ProjectResponse>{
@@ -23,7 +34,8 @@ export async function createProject(name: string): Promise<ProjectResponse>{
         body: JSON.stringify({name})
     });
     if(!response.ok) throw new Error(await extractErrorMessage(response, 'Error al crear proyecto'));
-    return response.json();
+    const project: ProjectResponse = await response.json();
+    return withDefaultDiagrams(project);
 }
 
 

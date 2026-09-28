@@ -7,6 +7,7 @@ export function useProjects() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  
   const loadProjects = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -19,6 +20,26 @@ export function useProjects() {
       setLoading(false);
     }
   }, []);
+
+  //When a project is opened, it needs to be updated locally.
+  //As every project starts with a null value on diagrams,
+  //when is opned, you click "updateProjectDiagrams". In this case,
+  //is a callback function that iterates on all projects (adding them up on an
+  //list of projects) until it finds the one to be changed(the one which needs
+  //diagrams to be added) and adds the diagrams locally in the project(so it has them)
+  //after that, it keeps iterating until all projects are added.Then, it sets the projects
+  //and now the diagrams of the opened project are loaded, so when opening it again,
+  //it doesn't do the fetch again for that project
+  const updateProjectDiagrams = useCallback(
+    (projectId: string, diagrams: NonNullable<ProjectResponse["Diagrams"]>) => {
+      setProjects((current) =>
+        current.map((project) =>
+          project.id === projectId ? { ...project, Diagrams: diagrams } : project,
+        ),
+      );
+    },
+    [],
+  );
 
   useEffect(() => {
     let active = true;
@@ -61,6 +82,7 @@ export function useProjects() {
     error,
     addProject,
     removeProject,
+    updateProjectDiagrams,
     reload: loadProjects,
   };
 }

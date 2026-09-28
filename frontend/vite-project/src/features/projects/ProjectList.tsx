@@ -2,13 +2,18 @@ import { ProjectCard } from "./ProjectCard";
 import { useProjects } from "./useProjects";
 import { useState } from "react";
 import { type FormEvent } from "react";
+import { DiagramList } from "../diagrams/DiagramList";
+import type { ProjectResponse } from "../../types/ProjectResponse";
 
 export function ProjectList(){
     
-    const {projects, loading, error, addProject, removeProject} = useProjects();
+    const {projects, loading, error, addProject, removeProject, updateProjectDiagrams} = useProjects();
     const [newName, setNewName] = useState('');
     const [creating, setCreating] = useState(false);
     const [createError, setCreateError] = useState<string | null>(null);
+    const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
+    const selectedProject: ProjectResponse | null =
+        projects.find((project) => project.id === selectedProjectId) ?? null;
 
     async function handleCreate(e: FormEvent){
         
@@ -61,9 +66,45 @@ export function ProjectList(){
 
             <div>
                 {projects.map((project) => (
-                    <ProjectCard key={project.id} project={project} onDelete={handleDelete}/>
+                    <ProjectCard
+                        key={project.id}
+                        project={project}
+                        onDelete={handleDelete}
+                        onOpen={setSelectedProjectId}
+                    />
                 ))}
             </div>
+
+            {selectedProject && (
+                <div
+                    className="project-modal-backdrop"
+                    onClick={(event) => {
+                        if (event.target === event.currentTarget) setSelectedProjectId(null);
+                    }}
+                >
+                    <section
+                        className="project-modal"
+                        role="dialog"
+                        aria-modal="true"
+                        aria-labelledby="project-modal-title"
+                    >
+                        <header className="project-modal-header">
+                            <h2 id="project-modal-title">{selectedProject.name}</h2>
+                            <button
+                                type="button"
+                                aria-label="Cerrar"
+                                onClick={() => setSelectedProjectId(null)}
+                            >
+                                Cerrar
+                            </button>
+                        </header>
+                        <DiagramList
+                            project={selectedProject}
+                            onDiagramsChange={updateProjectDiagrams}
+                        />
+                    </section>
+                </div>
+            )}
 
         </div>
     );

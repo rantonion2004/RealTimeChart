@@ -1,20 +1,20 @@
-import {Link} from 'react-router-dom';
 import type { ProjectResponse } from '../../types/ProjectResponse';
 
 interface ProjectCardProps {
     project: ProjectResponse;
     onDelete:(id: string) => void;
+    onOpen:(id: string) => void;
 }
 
-export function ProjectCard({project, onDelete}: ProjectCardProps){
+export function ProjectCard({project, onDelete, onOpen}: ProjectCardProps){
     return(
         <div>
-            <Link to={`/projects/${project.id}`}>
+            <button type="button" onClick={() => onOpen(project.id)}>
                 <h3>{project.name}</h3>
-            </Link>
+            </button>
             <span>Rol: {project.myRole}</span>
-            {project.myRole === 'Owner' &&(
-                <button onClick={() => onDelete(project.id)}></button>
+            {project.myRole == 'Owner' && (
+                <button onClick={() => onDelete(project.id)}>borrar</button>
             )} 
         </div>
     );
