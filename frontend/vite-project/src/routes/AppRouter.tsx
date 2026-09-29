@@ -6,39 +6,48 @@ import { ProtectedRoute } from '../routes/ProtectedRoute';
 import { RegisterPage } from '../pages/RegisterPage';
 import { PublicOnlyRoute } from './PublicOnlyRoute';
 import { ProjectsPage } from '../pages/ProjectsPage';
+import { DiagramEditorPage } from '../pages/DiagramEditorPage';
+import { AppLayout } from '../layouts/AppLayout';
+import { EditorLayout } from '../layouts/EditorLayout';
 
 export function AppRouter(){
     return (
         <Routes>
             <Route path="/" element={<App />} />
             
-            <Route path="/login" element={
-                <PublicOnlyRoute>
-                    <LoginPage />
-                </PublicOnlyRoute>} />
+            <Route element={<PublicOnlyRoute/>}>
+                <Route path="/login" element={ <LoginPage /> } />
+                <Route path="/register" element={ <RegisterPage /> } />
+            </Route>
 
-            <Route path="/register" element={
-                <PublicOnlyRoute>
-                    <RegisterPage />
-                </PublicOnlyRoute>} />
+            <Route element={<ProtectedRoute/>}>
+                
+                <Route element={<AppLayout/>}>
+                    
+                    <Route
+                        path="/home"
+                        element={<HomePage/>}
+                    />
 
-            <Route
-                path="/home"
-                element={
-                    <ProtectedRoute>
-                        <HomePage/>
-                    </ProtectedRoute>
-                }
-            />
+                    <Route
+                        path="/projects"
+                        element={<ProjectsPage/>}
+                    />
 
-            <Route
-                path="/projects"
-                element={
-                    <ProtectedRoute>
-                        <ProjectsPage />
-                    </ProtectedRoute>
-                }
-            />
+                </Route>
+
+                <Route element={<EditorLayout/>}>
+                    <Route
+                        path="/projects/:projectId/diagrams/:diagramId"
+                        element={
+                            <DiagramEditorPage/>
+                        }
+                    
+                    />
+                </Route>    
+
+            </Route>
+            
         </Routes>
     );
 }

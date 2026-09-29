@@ -2,6 +2,9 @@ import type { DiagramSummaryResponse } from "../../types/DiagramResponse";
 
 import type { ProjectResponse } from "../../types/ProjectResponse";
 import { getRoleName, Role } from "../../types/Role";
+import { Link } from "react-router-dom";
+
+
 interface DiagramCardProps{
     project: ProjectResponse,
     diagram: DiagramSummaryResponse,
@@ -11,7 +14,9 @@ interface DiagramCardProps{
 export function DiagramCard({diagram, project, onDelete}: DiagramCardProps){
     return(
         <div>
-            <h3>{diagram.name}</h3>
+            <Link to={`/projects/${project.id}/diagrams/${diagram.id}`} >
+                <h3>{diagram.name}</h3>
+            </Link>
             <span>Rol: {project.myRole === null ? "Sin rol" : getRoleName(project.myRole)}</span>
             {project.myRole === Role.Owner || project.myRole === Role.Editor &&(
                 <button type="button" onClick={() => onDelete(project.id, diagram.id)}>Borrar</button>

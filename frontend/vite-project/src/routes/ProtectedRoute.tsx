@@ -1,25 +1,7 @@
-import { Navigate } from 'react-router-dom';
-import type { ReactNode } from 'react'
-import {useAuth} from '../hooks/useAuth';
-import {NavBar} from '../components/NavBar';
-import { useAuthActions } from '../hooks/useAuthActions';
-//import { useNavigate } from 'react-router-dom';
+import { Navigate, Outlet } from 'react-router-dom';
+import { useAuth } from '../hooks/useAuth';
 
-
-export function ProtectedRoute({children}: {children: ReactNode}){
-    const {isAuthenticated, displayName} = useAuth();
-    //const navigate = useNavigate();
-    const {logoutUser} = useAuthActions();
-
-    async function handleLogout(){
-        await logoutUser();
-        //navigate('/login');
-    }
-
-    
-    return !isAuthenticated ? <Navigate to="/login" replace />: 
-    <>
-        <NavBar onLogout={handleLogout} dispName={displayName} />
-        {children}
-    </>;
+export function ProtectedRoute() {
+  const { isAuthenticated } = useAuth();
+  return isAuthenticated ? <Outlet /> : <Navigate to="/login" replace />;
 }

@@ -1,9 +1,7 @@
-import { Navigate } from "react-router-dom";
+import { Navigate, Outlet } from 'react-router-dom';
+import { useAuth } from '../hooks/useAuth';
 
-import { type ReactNode } from "react";
-import { useAuth } from "../hooks/useAuth";
-
-export function PublicOnlyRoute({children}: {children: ReactNode}){
-    const{isAuthenticated} = useAuth();
-    return isAuthenticated ? <Navigate to="/home" replace /> : <>{children}</>
+export function PublicOnlyRoute() {
+  const { isAuthenticated } = useAuth();
+  return isAuthenticated ? <Navigate to="/home" replace /> : <Outlet />;
 }
