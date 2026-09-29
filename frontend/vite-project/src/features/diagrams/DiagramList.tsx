@@ -5,19 +5,21 @@ import { useDiagrams } from "./useDiagrams";
 import type { ProjectResponse } from "../../types/ProjectResponse";
 import { type FormEvent } from "react";
 import { useState } from "react";
+import { type DiagramSummaryResponse } from "../../types/DiagramResponse";
 
 interface DiagramListProps {
     project: ProjectResponse;
+    cachedDiagrams: DiagramSummaryResponse[] | undefined
     onDiagramsChange: (
         projectId: string,
-        diagrams: NonNullable<ProjectResponse["Diagrams"]>,
+        diagrams: DiagramSummaryResponse[],
     ) => void;
 }
 
-export function DiagramList({project, onDiagramsChange}: DiagramListProps){
+export function DiagramList({project, cachedDiagrams, onDiagramsChange}: DiagramListProps){
 
     const {diagrams, loading, error, addDiagram, removeDiagram} =
-        useDiagrams(project, onDiagramsChange);
+        useDiagrams(project, cachedDiagrams, onDiagramsChange);
     const [newName, setNewName] = useState('');
     const [creating, setCreating] = useState(false);
     const [createError, setCreateError] = useState<string | null>(null);
@@ -61,7 +63,7 @@ export function DiagramList({project, onDiagramsChange}: DiagramListProps){
                 <button  type="submit" disabled={creating}>
                     {creating? 'Creando...': 'Crear diagrama'}
                 </button>
-                {createError && <p role='alerts'>{createError}</p>}
+                {createError && <p role='alert'>{createError}</p>}
             </form>
 
             {loading && <p>Cargando diagramas...</p>}

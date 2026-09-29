@@ -7,7 +7,7 @@ import type { ProjectResponse } from "../../types/ProjectResponse";
 
 export function ProjectList(){
     
-    const {projects, loading, error, addProject, removeProject, updateProjectDiagrams} = useProjects();
+    const {projects, loading, error, addProject, removeProject, updateProjectDiagrams, diagramsCache} = useProjects();
     const [newName, setNewName] = useState('');
     const [creating, setCreating] = useState(false);
     const [createError, setCreateError] = useState<string | null>(null);
@@ -55,7 +55,7 @@ export function ProjectList(){
                 <button type="submit" disabled={creating}>
                     {creating? 'Creando...': 'Crear proyecto'}
                 </button>
-                {createError && <p role='alerts'>{createError}</p>}
+                {createError && <p role='alert'>{createError}</p>}
             </form>
 
             {loading && <p>Cargando proyectos...</p>}
@@ -98,10 +98,14 @@ export function ProjectList(){
                                 Cerrar
                             </button>
                         </header>
-                        <DiagramList
+                        
+                        <DiagramList 
+                            key={selectedProject.id}
                             project={selectedProject}
                             onDiagramsChange={updateProjectDiagrams}
+                            cachedDiagrams={diagramsCache[selectedProject.id]}
                         />
+
                     </section>
                 </div>
             )}

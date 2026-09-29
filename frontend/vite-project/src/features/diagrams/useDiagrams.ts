@@ -9,60 +9,63 @@ type DiagramsChangeHandler = (
 ) => void;
 
 export function useDiagrams(
-    project: ProjectResponse,
-    onDiagramsChange: DiagramsChangeHandler,
-){
-    const [diagrams, setDiagrams] = useState<DiagramSummaryResponse[]>(project.Diagrams ?? []);
-    const [loading, setLoading] = useState(project.Diagrams === null);
+  project: ProjectResponse,
+  cachedDiagrams: DiagramSummaryResponse[] | undefined,
+  onDiagramsChange: DiagramsChangeHandler,
+) {
+    const [diagrams, setDiagrams] = useState<DiagramSummaryResponse[]>(
+    cachedDiagrams ?? [],
+    );
+    const [loading, setLoading] = useState(cachedDiagrams === undefined);
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        let active = true;
-        if (project.Diagrams !== null) return;
+      let active = true;
+      if (cachedDiagrams !== undefined) return; // ya está en caché, no vuelvas a pedir
 
-        getAllDiagrams(project.id)
-            .then((data) => {
-                if (active) {
-                    setDiagrams(data);
-                    onDiagramsChange(project.id, data);
-                }
-            })
-            .catch((err: unknown) => {
-                if (active) {
-                    setError(err instanceof Error ? err.message : "Error desconocido");
-                }
-            })
-            .finally(() => {
-                if (active) setLoading(false);
-            });
+      getAllDiagrams(project.id)
+        .then((data) => {
+          if (active) {
+            setDiagrams(data);
+            onDiagramsChange(project.id, data);
+          }
+        })
+        .catch((err: unknown) => {
+          if (active) {
+            setError(err instanceof Error ? err.message : "Error desconocido");
+          }
+        })
+        .finally(() => {
+          if (active) setLoading(false);
+        });
 
-        return () => {
-            active = false;
-        };
+      return () => {
+        active = false;
+      };
+    }, [project.id, cachedDiagrams, onDiagramsChange]);
 
-    }, [project.id, project.Diagrams, onDiagramsChange]);
-
-    async function addDiagram(name: string, projectId: string){
+    async function addDiagram(name: string, projectId: string) {
         const newDiagram = await createDiagram(projectId, name);
         const updatedDiagrams = [newDiagram, ...diagrams];
         setDiagrams(updatedDiagrams);
         onDiagramsChange(projectId, updatedDiagrams);
     }
 
-    async function removeDiagram(projectId: string, diagramId: string){
+    async function removeDiagram(projectId: string, diagramId: string) {
         await deleteDiagram(projectId, diagramId);
-        const updatedDiagrams = diagrams.filter((diagram) => diagram.id !== diagramId);
+        const updatedDiagrams = diagrams.filter(
+        (diagram) => diagram.id !== diagramId,
+        );
         setDiagrams(updatedDiagrams);
         onDiagramsChange(projectId, updatedDiagrams);
     }
 
-    return {    
+    return {
         diagrams,
         loading,
         error,
         addDiagram,
-        removeDiagram
-
+        removeDiagram,
     };
 }
 

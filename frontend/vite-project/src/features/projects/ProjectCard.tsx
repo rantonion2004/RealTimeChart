@@ -1,4 +1,5 @@
 import type { ProjectResponse } from '../../types/ProjectResponse';
+import { getRoleName, Role } from '../../types/Role';
 
 interface ProjectCardProps {
     project: ProjectResponse;
@@ -12,8 +13,8 @@ export function ProjectCard({project, onDelete, onOpen}: ProjectCardProps){
             <button type="button" onClick={() => onOpen(project.id)}>
                 <h3>{project.name}</h3>
             </button>
-            <span>Rol: {project.myRole}</span>
-            {project.myRole == 'Owner' && (
+            <span>Rol: {project.myRole === null ? "Sin rol" : getRoleName(project.myRole)}</span>
+            {project.myRole === Role.Owner && (
                 <button onClick={() => onDelete(project.id)}>borrar</button>
             )} 
         </div>

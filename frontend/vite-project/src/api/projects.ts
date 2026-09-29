@@ -3,11 +3,17 @@
 
 import {apiFetch, extractErrorMessage} from "./client";
 import { type ProjectResponse } from "../types/ProjectResponse";
+//import { parseRole } from "../types/Role";
 
 //with default diagrams receives the project and
 //returns it with its diagram(if it has) or a null(it it doesn't have)
-function withDefaultDiagrams(project: ProjectResponse): ProjectResponse {
-    return { ...project, Diagrams: project.Diagrams ?? null };
+function fixExtractedProject(project: ProjectResponse): ProjectResponse {
+    console.log(project.name, project.myRole);
+    return {
+        ...project,
+        //myRole: parseRole(project.myRole),
+        //Diagrams: project.Diagrams ?? null,
+    };
 }
 //now, on each answer, if it returns a ProjectResponse,
 //it needs to return it with diagrams, if they don't have diagrams,
@@ -16,16 +22,19 @@ function withDefaultDiagrams(project: ProjectResponse): ProjectResponse {
 
 export async function getMyProjects(): Promise<ProjectResponse[]>{
     const response = await apiFetch('/api/projects');
+    
     if(!response.ok) throw new Error(await extractErrorMessage(response, 'Error al cargar proyectos'));
+    
     const projects: ProjectResponse[] = await response.json();
-    return projects.map(withDefaultDiagrams);
+    console.log("From get: ", projects);
+    return projects.map(fixExtractedProject);
 }
 
 export async function getById(projectId: string): Promise<ProjectResponse>{
     const response = await apiFetch(`/api/projects/${projectId}`);
     if(!response.ok) throw new Error(await extractErrorMessage(response, 'Error al cargar proyecto'));
     const project: ProjectResponse = await response.json();
-    return withDefaultDiagrams(project);
+    return fixExtractedProject(project);
 }
 
 export async function createProject(name: string): Promise<ProjectResponse>{
@@ -35,7 +44,7 @@ export async function createProject(name: string): Promise<ProjectResponse>{
     });
     if(!response.ok) throw new Error(await extractErrorMessage(response, 'Error al crear proyecto'));
     const project: ProjectResponse = await response.json();
-    return withDefaultDiagrams(project);
+    return fixExtractedProject(project);
 }
 
 

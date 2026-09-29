@@ -1,12 +1,14 @@
 import { useState, useEffect, useCallback } from "react";
 import { getMyProjects, createProject, deleteProject } from "../../api/projects";
 import type { ProjectResponse } from "../../types/ProjectResponse";
-
+import type { DiagramSummaryResponse } from "../../types/DiagramResponse";
 export function useProjects() {
   const [projects, setProjects] = useState<ProjectResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
+  const [diagramsCache, setDiagramsCache] = useState<
+    Record<string, DiagramSummaryResponse[]>
+  >({});
   
   const loadProjects = useCallback(async () => {
     setLoading(true);
@@ -30,15 +32,24 @@ export function useProjects() {
   //after that, it keeps iterating until all projects are added.Then, it sets the projects
   //and now the diagrams of the opened project are loaded, so when opening it again,
   //it doesn't do the fetch again for that project
+  // const updateProjectDiagrams = useCallback(
+  //   (projectId: string, diagrams: NonNullable<ProjectResponse["Diagrams"]>) => {
+  //     setProjects((current) =>
+  //       current.map((project) =>
+  //         project.id === projectId ? { ...project, Diagrams: diagrams } : project,
+  //       ),
+  //     );
+  //   },
+  //   [],
+  // );
+
+  //changed, now it updates the local state diagramsCache, instead of modifying the whole project
+  //it saves it in 
   const updateProjectDiagrams = useCallback(
-    (projectId: string, diagrams: NonNullable<ProjectResponse["Diagrams"]>) => {
-      setProjects((current) =>
-        current.map((project) =>
-          project.id === projectId ? { ...project, Diagrams: diagrams } : project,
-        ),
-      );
+    (projectId: string, diagrams: DiagramSummaryResponse[]) => {
+      setDiagramsCache((current) => ({ ...current, [projectId]: diagrams }));
     },
-    [],
+    []
   );
 
   useEffect(() => {
@@ -82,6 +93,7 @@ export function useProjects() {
     error,
     addProject,
     removeProject,
+    diagramsCache,
     updateProjectDiagrams,
     reload: loadProjects,
   };
