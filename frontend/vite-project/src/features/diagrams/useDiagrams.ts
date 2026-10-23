@@ -60,6 +60,8 @@ export function useDiagrams(
         onDiagramsChange(projectId, updatedDiagrams);
     }
 
+    
+
     return {
         diagrams,
         loading,
